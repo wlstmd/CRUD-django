@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1><a href="/">Django</a></h1>
+  <ul>
+    {% for topic in topics %}
+    <li><a href="/read/{{ topic.id }}">{{ topic.title }}</a></li>
+    {% endfor %}
+  </ul>
+  {% block content %}{% endblock %}
+  <ul>
+    {% if current_page != 'create' and current_page != 'read' %}
+    <li><a href="create">create</a></li>
+    {% endif %}
+    {% if current_topic_id %}
+    <li><a href="/update/{{ current_topic_id }}">update</a></li>
+    <li>
+      <form action="/delete/{{ current_topic_id }}/" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ current_topic_id }}">
+        <input type="submit" value="delete">
+      </form>
+    </li>
+    {% endif %}
+  </ul>
+</body>
+</html>

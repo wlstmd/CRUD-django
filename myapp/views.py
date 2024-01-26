@@ -8,66 +8,20 @@ topics = [
   {'id':3, 'title':'Model', 'body':'Model is ..'},
 ]
 
-def HTMLTemplate(articleTag, id=None):
-  global topics
-  contextUI = ''
-  if id != None:
-    contextUI = f'''
-        <li><a href="/update/{id}">update</a></li>
-                <li>
-          <form action="/delete" method="post">
-            <input type="hidden" name="id" value={id}>
-            <input type="submit" value="delete">
-          </form>
-        </li>
-    '''
-  ol = ''
-  for topic in topics:
-    ol += f'<li><a href="/read/{topic["id"]}">{topic["title"]}</a></li>'
-  return f'''
-    <html>
-    <body>
-      <h1><a href="/">Django</a></h1>
-      <ul>
-        {ol}
-      </ul>
-      {articleTag}
-      <ul>
-        <li><a href="/create">create</a></li>
-        {contextUI}
-      </ul>
-    </body>
-    </html>
-  '''
-
 def index(request):
-  article = '''
-    <h2>Welcome</h2>
-    Hello, Django
-  '''
-  return HttpResponse(HTMLTemplate(article))
+    return render(request, 'myapp/index.html', {'topics': topics})
 
 def read(request, id):
-  global topics
-  article = ''
-  for topic in topics:
-    if topic['id'] == int(id):
-      article = f'<h2>{topic["title"]}</h2>{topic["body"]}'
-  return HttpResponse(HTMLTemplate(article, id))
+    topic = next((topic for topic in topics if topic['id'] == int(id)), None)
+    if topic:
+        return render(request, 'myapp/read.html', {'topic': topic, 'topics': topics, 'current_topic_id': id, 'current_page': 'read'})
+    else:
+        return HttpResponse('No topic found with given id')
 
 @csrf_exempt
 def create(request):
   global nextId
-  if request.method =='GET':
-    article = '''
-      <form action="/create" method="post">
-        <p><input type="text" name="title" placeholder="title"></p>
-        <p><textarea name="body" placeholder="body"></textarea></p>
-        <p><input type="submit" value="제출"></p>
-      </form>
-    '''
-    return HttpResponse(HTMLTemplate(article))
-  elif request.method == 'POST':
+  if request.method =='POST':
     title = request.POST["title"]
     body = request.POST["body"]
     newTopic = {"id":nextId, "title":title, "body":body}
@@ -75,42 +29,20 @@ def create(request):
     url = '/read/' + str(nextId)
     nextId = nextId + 1
     return redirect(url)
-  
-@csrf_exempt
-def update(request, id):
-  global topics
-  if request.method == 'GET':
-    for topic in topics:
-      if topic["id"] == int(id):
-        selectedTopic = {
-          "title":topic["title"],
-          "body":topic["body"]
-          }
-    article = f'''
-      <form action="/update/{id}/" method="post">
-        <p><input type="text" name="title" placeholder="title" value={selectedTopic["title"]}></p>
-        <p><textarea name="body" placeholder="body">{selectedTopic["body"]}</textarea></p>
-        <p><input type="submit" value="제출"></p>
-      </form>
-    '''
-    return HttpResponse(HTMLTemplate(article, id))
-  elif request.method == 'POST':
-    title = request.POST["title"]
-    body = request.POST["body"]
-    for topic in topics:
-      if topic["id"] == int(id):
-        topic["title"] = title
-        topic["body"] = body
-    return redirect(f'/read/{id}')
+  return render(request, 'myapp/create.html', {'topics': topics, 'current_page': 'create'})
+
 
 @csrf_exempt
-def delete(request):
+def update(request, id):
+  topic = next((topic for topic in topics if topic['id'] == int(id)), None)
+  if request.method == 'POST' and topic:
+    topic['title'] = request.POST['title']
+    topic['body'] = request.POST['body']
+    return redirect(f'/read/{id}')
+  return render(request, 'myapp/update.html', {'topic': topic, 'topics': topics, 'current_topic_id': id})
+
+@csrf_exempt
+def delete(request, id):
   global topics
-  if request.method == 'POST':
-    id = request.POST["id"]
-    newTopics = []
-    for topic in topics:
-      if topic["id"] != int(id):
-        newTopics.append(topic)
-    topics = newTopics
-    return redirect("/")
+  topics = [topic for topic in topics if topic["id"] != int(id)]
+  return redirect('/')
