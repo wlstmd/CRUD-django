@@ -9,7 +9,7 @@ topics = [
 ]
 
 def index(request):
-    return render(request, 'myapp/index.html', {'topics': topics})
+    return render(request, 'myapp/index.html', {'topics': topics, 'current_page': 'home'})
 
 def read(request, id):
     topic = next((topic for topic in topics if topic['id'] == int(id)), None)
@@ -34,12 +34,12 @@ def create(request):
 
 @csrf_exempt
 def update(request, id):
-  topic = next((topic for topic in topics if topic['id'] == int(id)), None)
-  if request.method == 'POST' and topic:
-    topic['title'] = request.POST['title']
-    topic['body'] = request.POST['body']
-    return redirect(f'/read/{id}')
-  return render(request, 'myapp/update.html', {'topic': topic, 'topics': topics, 'current_topic_id': id})
+    topic = next((topic for topic in topics if topic['id'] == int(id)), None)
+    if request.method == 'POST' and topic:
+        topic['title'] = request.POST['title']
+        topic['body'] = request.POST['body']
+        return redirect(f'/read/{id}')
+    return render(request, 'myapp/update.html', {'topic': topic, 'topics': topics, 'current_topic_id': id, 'current_page': 'update'})
 
 @csrf_exempt
 def delete(request, id):

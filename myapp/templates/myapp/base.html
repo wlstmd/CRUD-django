@@ -1,32 +1,35 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'myapp/styles.css' %}">
+  <title>Django</title>
 </head>
 <body>
-  <h1><a href="/">Django</a></h1>
-  <ul>
-    {% for topic in topics %}
-    <li><a href="/read/{{ topic.id }}">{{ topic.title }}</a></li>
-    {% endfor %}
-  </ul>
-  {% block content %}{% endblock %}
-  <ul>
-    {% if current_page != 'create' and current_page != 'read' %}
-    <li><a href="create">create</a></li>
-    {% endif %}
-    {% if current_topic_id %}
-    <li><a href="/update/{{ current_topic_id }}">update</a></li>
-    <li>
-      <form action="/delete/{{ current_topic_id }}/" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="id" value="{{ current_topic_id }}">
-        <input type="submit" value="delete">
-      </form>
-    </li>
-    {% endif %}
-  </ul>
+  <header>
+    <h2><a href="/">Home</a></h2>
+    <h3>게시글 목록</h3>
+    <ul>
+      {% for topic in topics %}
+      <li><a href="/read/{{ topic.id }}">{{ topic.title }}</a></li>
+      {% endfor %}
+    </ul>
+    {% block content %}{% endblock %}
+      {% if current_page == 'home' %}
+      <div class="sub"><a href="create">생성</a></div>
+      {% endif %}
+      {% if current_topic_id %}
+      {% if current_topic_id and current_page != 'update' %}
+      <div class="sub"><a href="/update/{{ current_topic_id }}">업뎃</a></div>
+      {% endif %}
+        <form action="/delete/{{ current_topic_id }}/" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="id" value="{{ current_topic_id }}">
+          <input class="sub" style="margin-top: 0px; width: 95px; font-size: 1rem;" type="submit" value="삭제">
+        </form>
+      {% endif %}
+  </header>
 </body>
 </html>

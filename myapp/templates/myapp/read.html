@@ -1,5 +1,9 @@
 {% extends 'myapp/base.html' %}
 {% block content %}
-  <h2>{{ topic.title }}</h2>
+<div class="description">
+  <div class="des">제목</div>
+  <h>{{ topic.title }}</h>
+  <div class="des">내용</div>
   <p>{{ topic.body }}</p>
+</div>
 {% endblock %}
