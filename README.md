@@ -17,5 +17,3 @@
 `python3 manage.py flush` : db 테이블은 그대로 두고 테이블의 내용만 전부 삭제<br/>
 `python3 manage.py shell` : shell을 실행. 작성한 모델 등을 불러와 실제로 테스트 해볼 수 있음.<br/>
 `python3 manage.py dbshell` : db 에 직접 접근할 수 있는 shell 을 실행.<br/>
-
-- 참고 : https://github.com/NohGaSeong/Django-RoadMap
